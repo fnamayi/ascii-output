@@ -34,7 +34,7 @@ func InputArgs(osArgs []string) ([]string, int) {
 }
 
 // FileChoice function selects the appropriate ASCII art file to read
-//changes to be done to accept --output flag
+// changes to be done to accept --output flag
 func FileChoice(osArgs []string) []string {
 	var file []byte
 	var asciiFields []string
