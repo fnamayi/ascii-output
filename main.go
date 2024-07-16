@@ -1,48 +1,51 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-
 	ascii "ascii-output/pkg"
 )
 
 func main() {
-	input, _ := ascii.InputArgs(os.Args)
-	asciiFields := ascii.FileChoice(os.Args)
-	printWords(input, asciiFields)
-}
+	// Define the output flag
+	outputFlag := flag.String("output", "", "Specify the output file name as --output=<fileName.txt>")
+	// Parse the flags
+	flag.Parse()
+	args := flag.Args()
 
-// printing of the characters
-func printWords(input []string, asciiFields []string) {
-	for _, word := range input {
-		if word == "" {
-			fmt.Println()
-		} else {
-			for i := 0; i < 8; i++ {
-				for _, char := range word {
-					if !validChar(char) {
-						return
-					}
-					startPoint := Start(int(char))
-					fmt.Print(asciiFields[startPoint+i])
-				}
-				fmt.Println()
-			}
-		}
+	// Check if the correct number of arguments is provided
+	if len(args) < 1 || len(args) > 2 || *outputFlag == "" {
+		ascii.PrintUsage()
+		return
 	}
-}
 
-// starting positions of the characters
-func Start(s int) int {
-	pos := int(s-32)*9 + 1
-	return pos
-}
+	// Get the STRING argument
+	inputString := args[0]
 
-func validChar(s rune) bool {
-	if !(s >= ' ' && s <= '~') {
-		fmt.Println("Error:" + string(s) + " " + "is not valid character input")
-		return false
+	// Optionally get the BANNER argument
+	banner := "standard"
+	if len(args) == 2 {
+		banner = args[1]
 	}
-	return true
+
+	// Get the ASCII art content based on the banner
+	asciiContent, err := ascii.GetASCIIContent(banner)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Generate the ASCII art for the input string
+	result := ascii.GenerateASCIIArt(inputString, asciiContent)
+
+	// Save the result to the specified output file
+	err = os.WriteFile(*outputFlag, []byte(result), 0644)
+	if err != nil {
+		fmt.Printf("Error writing to file: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Output saved to %s\n", *outputFlag)
+
 }

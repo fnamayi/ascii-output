@@ -6,84 +6,46 @@ import (
 	"strings"
 )
 
-// InputArgs function processes command-line arguments
-func InputArgs(osArgs []string) ([]string, int) {
-	var args string
-	if !(len(osArgs) == 2 || len(osArgs) == 3) {
-		fmt.Println("usage: go run . <input string> <optional flag>")
-		return []string{}, 0
-	} else if len(osArgs) == 3 && !(osArgs[2] == "-t" || osArgs[2] == "-sh") {
-		fmt.Println("Only one string is accepted")
-		return []string{}, 0
-	} else {
-		args = osArgs[1]
-	}
-
-	args = strings.ReplaceAll(args, "\n", "\\n")
-	args = strings.ReplaceAll(args, "\\t", " ")
-
-	input := strings.Split(args, "\\n")
-
-	if input[0] == "" && len(input) == 1 {
-		os.Exit(0)
-	} else if input[0] == "" && input[1] == "" && len(input) == 2 {
-		fmt.Println()
-		os.Exit(0)
-	}
-	return input, len(osArgs)
+// printUsage prints the usage message
+func PrintUsage() {
+	fmt.Println("Usage: go run . --output=<fileName.txt> [STRING] [BANNER]")
+	fmt.Println("EX: go run . --output=<fileName.txt> something standard")
 }
 
-// FileChoice function selects the appropriate ASCII art file to read
-// changes to be done to accept --output flag
-func FileChoice(osArgs []string) []string {
-	var file []byte
-	var asciiFields []string
-
-	if len(osArgs) == 3 && osArgs[2] == "-t" {
-		filec, err := os.ReadFile("thinkertoy.txt")
-		file = filec
-		asciiField := strings.Split(string(file), "\r\n")
-		asciiFields = asciiField
-		if Tamper(asciiFields) {
-			os.Exit(0)
-		}
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(0)
-		}
-	} else if len(osArgs) == 3 && osArgs[2] == "-sh" {
-		filec, err := os.ReadFile("shadow.txt")
-		file = filec
-		asciiField := strings.Split(string(file), "\n")
-		asciiFields = asciiField
-		if Tamper(asciiFields) {
-			return []string{}
-		}
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(0)
-		}
-	} else if len(osArgs) == 2 {
-		filec, err := os.ReadFile("standard.txt")
-		file = filec
-		asciiField := strings.Split(string(file), "\n")
-		asciiFields = asciiField
-		if Tamper(asciiFields) {
-			os.Exit(0)
-		}
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(0)
-		}
+// getASCIIContent reads the appropriate ASCII art file based on the banner argument
+func GetASCIIContent(banner string) ([]string, error) {
+	var fileName string
+	switch banner {
+	case "standard":
+		fileName = "standard.txt"
+	case "shadow":
+		fileName = "shadow.txt"
+	case "thinkertoy":
+		fileName = "thinkertoy.txt"
+	default:
+		return nil, fmt.Errorf("unsupported banner: %s", banner)
 	}
 
-	return asciiFields
+	content, err := os.ReadFile(fileName)
+	if err != nil {
+		return nil, err
+	}
+
+	return strings.Split(string(content),"\n"), nil
 }
 
-func Tamper(s []string) bool {
-	if len(s) != 856 {
-		fmt.Println("The File Banner used has been tampered with or is Empty")
-		return true
+// generateASCIIArt generates ASCII art for the given input string using the ASCII content
+func GenerateASCIIArt(input string, asciiContent []string) string {
+	var result strings.Builder
+	for _, char := range input {
+		if char >= 32 && char <= 126 {
+			start := (int(char) - 32) * 9
+			for i := 0; i < 8; i++ {
+				result.WriteString(asciiContent[start+i])
+				result.WriteString("\n")
+			}
+		}
+		result.WriteString("\n")
 	}
-	return false
+	return result.String()
 }
