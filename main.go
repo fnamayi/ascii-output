@@ -4,48 +4,72 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
+
 	ascii "ascii-output/pkg"
 )
 
 func main() {
-	// Define the output flag
-	outputFlag := flag.String("output", "", "Specify the output file name as --output=<fileName.txt>")
-	// Parse the flags
+	if len(os.Args) <= 1 {
+		Errormsg()
+		os.Exit(0)
+		// return
+
+	}
+	// Declare flag
+	var outputFileName string
+	flag.StringVar(&outputFileName, "output", "", "Output file name (required)")
+
 	flag.Parse()
+
+	if outputFileName == "" {
+		Errormsg()
+		os.Exit(1)
+	} else if outputFileName == "standard.txt" || outputFileName == "shadow.txt" || outputFileName == "thinkertoy.txt" {
+		fmt.Println("Error: You can not write on these banner files.")
+		return
+	} else if strings.HasSuffix(outputFileName, "/standard.txt") || strings.HasSuffix(outputFileName, "/shadow.txt") || strings.HasSuffix(outputFileName, "/thinkertoy.txt") {
+		fmt.Println("Warning: Attempt to edit banner f ile")
+		return
+	}
+
+	// Remaining arguments after flags
 	args := flag.Args()
 
-	// Check if the correct number of arguments is provided
-	if len(args) < 1 || len(args) > 2 || *outputFlag == "" {
-		ascii.PrintUsage()
-		return
+	var banner, input string
+
+	if len(args) == 1 {
+		input = args[0]
+		banner = "standard"
+	} else if len(args) == 2 {
+		input = args[0]
+		banner = strings.ToLower(args[1])
+	} else {
+		Errormsg()
+		os.Exit(1)
 	}
 
-	// Get the STRING argument
-	inputString := args[0]
+	switch banner {
+	case "shadow":
+		banner = "shadow.txt"
+	case "thinkertoy":
+		banner = "thinkertoy.txt"
 
-	// Optionally get the BANNER argument
-	banner := "standard"
-	if len(args) == 2 {
-		banner = args[1]
+	case "standard":
+		banner = "standard.txt"
 	}
 
-	// Get the ASCII art content based on the banner
-	asciiContent, err := ascii.GetASCIIContent(banner)
+	// Generate ASCII art
+	result := ascii.GenerateASCII(input, banner)
+
+	// Write result to file
+	err := ascii.WriteToOutputFile(outputFileName, result)
 	if err != nil {
-		fmt.Println(err)
-		return
+		fmt.Println("Error Writting to a file %:", err)
+		os.Exit(1)
 	}
+}
 
-	// Generate the ASCII art for the input string
-	result := ascii.GenerateASCIIArt(inputString, asciiContent)
-
-	// Save the result to the specified output file
-	err = os.WriteFile(*outputFlag, []byte(result), 0644)
-	if err != nil {
-		fmt.Printf("Error writing to file: %v\n", err)
-		return
-	}
-
-	fmt.Printf("Output saved to %s\n", *outputFlag)
-
+func Errormsg() {
+	fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --output=<fileName.txt> something standard")
 }

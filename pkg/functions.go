@@ -1,51 +1,60 @@
 package pkg
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
 )
 
-// printUsage prints the usage message
-func PrintUsage() {
-	fmt.Println("Usage: go run . --output=<fileName.txt> [STRING] [BANNER]")
-	fmt.Println("EX: go run . --output=<fileName.txt> something standard")
-}
-
-// getASCIIContent reads the appropriate ASCII art file based on the banner argument
-func GetASCIIContent(banner string) ([]string, error) {
-	var fileName string
-	switch banner {
-	case "standard":
-		fileName = "standard.txt"
-	case "shadow":
-		fileName = "shadow.txt"
-	case "thinkertoy":
-		fileName = "thinkertoy.txt"
-	default:
-		return nil, fmt.Errorf("unsupported banner: %s", banner)
-	}
-
-	content, err := os.ReadFile(fileName)
+func GetLine(filename string, num int) string {
+	file, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		fmt.Println("error opening file:", err)
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	lineNum := 1 // Line numbers start from 1
+	for scanner.Scan() {
+		if lineNum == num {
+			return scanner.Text()
+		}
+		lineNum++
 	}
 
-	return strings.Split(string(content),"\n"), nil
+	return ""
 }
 
-// generateASCIIArt generates ASCII art for the given input string using the ASCII content
-func GenerateASCIIArt(input string, asciiContent []string) string {
+func GenerateASCII(input, banner string) string {
 	var result strings.Builder
-	for _, char := range input {
-		if char >= 32 && char <= 126 {
-			start := (int(char) - 32) * 9
-			for i := 0; i < 8; i++ {
-				result.WriteString(asciiContent[start+i])
-				result.WriteString("\n")
-			}
+
+	// Iterate over each line (8 lines per character)
+	for line := 1; line < 9; line++ {
+		// Iterate over each character in input
+		for _, char := range input {
+			pos := 1 + int(char-' ')*9 + line
+			lineContent := GetLine(banner, pos)
+			result.WriteString(lineContent)
 		}
-		result.WriteString("\n")
+		result.WriteString("\n") // New line after each set of characters
 	}
+
 	return result.String()
+}
+
+func WriteToOutputFile(filename, content string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("error creating file %s: %v", filename, err)
+	}
+	defer file.Close()
+
+	_, err = fmt.Fprint(file, content)
+	if err != nil {
+		return fmt.Errorf("error writing to file %s: %v", filename, err)
+	}
+
+	return nil
 }
