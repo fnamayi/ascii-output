@@ -29,7 +29,7 @@ func main() {
 		fmt.Println("Error: You can not write on these banner files.")
 		return
 	} else if strings.HasSuffix(outputFileName, "/standard.txt") || strings.HasSuffix(outputFileName, "/shadow.txt") || strings.HasSuffix(outputFileName, "/thinkertoy.txt") {
-		fmt.Println("Warning: Attempt to edit banner f ile")
+		fmt.Println("Warning: Attempt to edit banner file")
 		return
 	}
 

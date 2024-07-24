@@ -19,25 +19,18 @@ The ascii-output package generates ASCII art from a given string input using var
 
 ## Installation
 
-To use the ascii-output package, ensure you have Go installed. You can install the package using go get:
+To use the ascii-output package, ensure you have Go installed.
 
-```bash
-
-go get github.com/yourusername/ascii-output
-```
 To clone and run this project locally, follow these steps:
 ```bash
-git clone https://<your-gitea-server>/your-username/repository-name.git
+git clone https://learn.zone01kisumu.ke/git/fnamayi/ascii-art-output
 ```
 Navigate to Project Directory:
 Change to the directory of the cloned repository:
 
 ```bash
-
-cd repository-name
+cd ascii-output
 ```
-
-Replace repository-name with the actual name of your cloned repository
 
 
 ## Usage
@@ -89,23 +82,27 @@ GenerateASCII(input string, banner string) string{}
 ```
 * `input (string)`: The input text that you want to convert into ASCII art.
 * `banner (string)`: The style of ASCII art banner to generate. It specifies the file from which each line of ASCII art characters will be retrieved.
+
 Generates ASCII art for the given input string using the specified banner template.
+## WriteToOutputfile
+```Bash
 WriteToOutputFile(filename string, content string) error
-
+```
 Writes the generated ASCII art content to the specified filename.
+```bash
 GetLine(filename string, num int) string
-
+```
 Helper function to retrieve a specific line from the filename file based on num.
 About
 
 The ascii-output package is designed to simplify the generation and storage of ASCII art, providing flexibility with different banner styles. It is suitable for command-line tools or applications requiring text-based visualizations.
 Contributors
 
-    Your Name
+    Arnold Adero
 
 Authors
 
-    Your Name
+    Frankline Nyamayi
 
 License
 
