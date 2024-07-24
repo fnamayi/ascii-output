@@ -84,26 +84,23 @@ GenerateASCII(input string, banner string) string{}
 * `banner (string)`: The style of ASCII art banner to generate. It specifies the file from which each line of ASCII art characters will be retrieved.
 
 Generates ASCII art for the given input string using the specified banner template.
-## WriteToOutputfile
-```Bash
-WriteToOutputFile(filename string, content string) error
+```bash
+WriteToOutputFile(filename string, content string) error{}
 ```
 Writes the generated ASCII art content to the specified filename.
 ```bash
-GetLine(filename string, num int) string
+GetLine(filename string, num int) string{}
 ```
 Helper function to retrieve a specific line from the filename file based on num.
-About
 
-The ascii-output package is designed to simplify the generation and storage of ASCII art, providing flexibility with different banner styles. It is suitable for command-line tools or applications requiring text-based visualizations.
-Contributors
+### Contributors
 
-    Arnold Adero
+ [Arnold Adero](https://github.com/arnoldadero)
 
-Authors
+### Authors
 
-    Frankline Nyamayi
+[Franklyne Namayi](https://github.com/fnamayi)
 
-License
+### License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the [MIT License](/LICENSE). See the LICENSE file for details.
