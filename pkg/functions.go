@@ -47,6 +47,10 @@ func GenerateASCII(input, banner string) string {
 }
 
 func WriteToOutputFile(filename, content string) error {
+	if !strings.HasSuffix(filename, ".txt") {
+		fmt.Println("Wrong file Extension")
+		os.Exit(1)
+	}
 	file, err := os.Create(filename)
 	if err != nil {
 		return fmt.Errorf("error creating file %s: %v", filename, err)
