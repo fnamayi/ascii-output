@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	ascii.ValidateFlagFormat()
+
 	if len(os.Args) <= 1 {
 		Errormsg()
 		os.Exit(0)
@@ -22,15 +24,9 @@ func main() {
 
 	flag.Parse()
 
-	if outputFileName == "" {
-		Errormsg()
+	if err := ascii.ValidateOutputFileName(outputFileName); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
-	} else if outputFileName == "standard.txt" || outputFileName == "shadow.txt" || outputFileName == "thinkertoy.txt" {
-		fmt.Println("Error: You can not write on these banner files.")
-		return
-	} else if strings.HasSuffix(outputFileName, "/standard.txt") || strings.HasSuffix(outputFileName, "/shadow.txt") || strings.HasSuffix(outputFileName, "/thinkertoy.txt") {
-		fmt.Println("Warning: Attempt to edit banner file")
-		return
 	}
 
 	// Remaining arguments after flags
@@ -40,29 +36,23 @@ func main() {
 
 	if len(args) == 1 {
 		input = args[0]
+		// input = strings.ReplaceAll(input, "/n", "//n")
+
 		banner = "standard"
 	} else if len(args) == 2 {
 		input = args[0]
+		// input = strings.ReplaceAll(input, "/n", "//n")
+
 		banner = strings.ToLower(args[1])
 	} else {
 		Errormsg()
 		os.Exit(1)
 	}
 
-	switch banner {
-	case "shadow":
-		banner = "shadow.txt"
-	case "thinkertoy":
-		banner = "thinkertoy.txt"
-
-	case "standard":
-		banner = "standard.txt"
-	}
-
-	// Generate ASCII art
+	// Generate ASCII art and store in variable result
 	result := ascii.GenerateASCII(input, banner)
 
-	// Write result to file
+	// Write result to file after error checking
 	err := ascii.WriteToOutputFile(outputFileName, result)
 	if err != nil {
 		fmt.Println("Error Writting to a file %:", err)
