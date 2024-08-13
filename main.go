@@ -6,57 +6,74 @@ import (
 	"os"
 	"strings"
 
-	ascii "ascii-output/pkg"
+	"ascii-output/pkg"
 )
 
 func main() {
-	ascii.ValidateFlagFormat()
+	// if len(os.Args) > 2 {
 
-	if len(os.Args) <= 1 {
-		Errormsg()
-		os.Exit(0)
-		// return
+	// }
 
-	}
-	// Declare flag
+	pkg.ValidateFlagFormat()
+
+	// Define and parse flags
 	var outputFileName string
-	flag.StringVar(&outputFileName, "output", "", "Output file name (required)")
+	flag.StringVar(&outputFileName, "output", "", "Output file name (optional)")
 
+	// Parse command-line flags
 	flag.Parse()
 
-	if err := ascii.ValidateOutputFileName(outputFileName); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	// Remaining arguments after flags
+	// Extract arguments after flags
 	args := flag.Args()
 
-	var banner, input string
+	if len(args) < 1 {
+		printUsage()
+		os.Exit(0)
+	}
 
-	if len(args) == 1 {
-		input = args[0]
-		// input = strings.ReplaceAll(input, "/n", "//n")
+	// Extract input and optional banner from arguments
+	input := args[0]
+	var banner string
 
-		banner = "standard"
-	} else if len(args) == 2 {
-		input = args[0]
-		// input = strings.ReplaceAll(input, "/n", "//n")
-
+	if len(args) > 1 {
 		banner = strings.ToLower(args[1])
 	} else {
+		banner = "standard" // Default banner if none is provided
+	}
+
+	// Map banner to file name
+	switch banner {
+	case "shadow":
+		banner = "shadow.txt"
+	case "thinkertoy":
+		banner = "thinkertoy.txt"
+	case "standard":
+		banner = "standard.txt"
+	default:
+		fmt.Printf("Unknown banner type: %s\n", banner)
 		Errormsg()
 		os.Exit(1)
 	}
 
-	// Generate ASCII art and store in variable result
-	result := ascii.GenerateASCII(input, banner)
+	// Generate ASCII art
+	result := pkg.GenerateASCII(input, banner)
 
-	// Write result to file after error checking
-	err := ascii.WriteToOutputFile(outputFileName, result)
-	if err != nil {
-		fmt.Println("Error Writting to a file %:", err)
-		os.Exit(1)
+	// Check if output file name is provided
+	if outputFileName != "" {
+		// Validate the output file name
+		if err := pkg.ValidateOutputFileName(outputFileName); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// Write result to file
+		if err := pkg.WriteToOutputFile(outputFileName, result); err != nil {
+			fmt.Println("Error writing to file:", err)
+			os.Exit(1)
+		}
+	} else {
+		// Print result to terminal
+		fmt.Println(result)
 	}
 }
 
