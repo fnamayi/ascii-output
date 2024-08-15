@@ -54,6 +54,16 @@ func main() {
 		Errormsg()
 		os.Exit(1)
 	}
+	switch banner {
+	case "shadow":
+		banner = "shadow.txt"
+	case "thinkertoy":
+		banner = "thinkertoy.txt"
+
+	case "standard":
+		banner = "standard.txt"
+	}
+
 
 	// Generate ASCII art
 	result := pkg.GenerateASCII(input, banner)

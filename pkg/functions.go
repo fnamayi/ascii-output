@@ -29,20 +29,22 @@ func GetLine(filename string, num int) string {
 	return ""
 }
 
-func GenerateASCII(input, banner string) string {
+func GenerateASCII(inputs, banner string) string {
 	var result strings.Builder
-
-	// Iterate over each line (8 lines per character)
-	for line := 1; line < 9; line++ {
-		// Iterate over each character in input
-		for _, char := range input {
-			pos := 1 + int(char-' ')*9 + line
-			lineContent := GetLine(banner, pos)
-			result.WriteString(lineContent)
+	inputs=strings.ReplaceAll(inputs, "\n","\\n")
+	slice := strings.Split(inputs, "\\n")
+	for _, input := range slice {
+		// Iterate over each line (8 lines per character)
+		for line := 1; line < 9; line++ {
+			// Iterate over each character in input
+			for _, char := range input {
+				pos := 1 + int(char-' ')*9 + line
+				lineContent := GetLine(banner, pos)
+				result.WriteString(lineContent)
+			}
+			result.WriteString("\n") // New line after each set of characters
 		}
-		result.WriteString("\n") // New line after each set of characters
 	}
-
 	return result.String()
 }
 
